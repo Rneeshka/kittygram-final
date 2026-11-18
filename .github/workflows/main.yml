@@ -158,9 +158,28 @@ jobs:
           sudo docker compose -f docker-compose.production.yml exec backend python manage.py collectstatic --noinput
           sudo docker compose -f docker-compose.production.yml exec backend cp -r /app/collected_static/. /backend_static/static/
 
-  send_message:
+  autotest:
     runs-on: ubuntu-24.04
     needs: deploy
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: 3.9
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install flake8==6.0.0
+          pip install -r backend/requirements.txt
+          pip install requests
+      - name: Run pytest
+        run: pytest 
+        
+  send_message:
+    runs-on: ubuntu-24.04
+    needs: autotest
     steps:
       - name: Sending alert in TG
         uses: appleboy/telegram-action@master
