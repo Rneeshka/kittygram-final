@@ -6,6 +6,7 @@ volumes:
 services:
   postgres:
     image: postgres:13
+    restart: always
     env_file: .env
     volumes:
       - pg_data:/var/lib/postgresql/data
@@ -17,6 +18,7 @@ services:
 
   backend:
     image: rneeshka/kittygram_backend
+    restart: always
     env_file: .env
     depends_on:
       postgres:
@@ -27,12 +29,14 @@ services:
 
   frontend:
     image: rneeshka/kittygram_frontend
+    restart: "no"
     command: cp -r /app/build/. /frontend_static/
     volumes:
       - static:/frontend_static
 
   gateway:
     image: rneeshka/kittygram_gateway
+    restart: always
     ports:
       - "9000:80"
     depends_on:
